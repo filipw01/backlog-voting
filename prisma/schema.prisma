@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  email        String         @id @unique
+  picture      String
+  name         String
+  tasksCreated Task[]         @relation(name: "TaskCreation")
+  assignments  Task[]         @relation(name: "TaskAssignment")
+  votes        VotesOnTasks[]
+}
+
+model Task {
+  id            String   @id @default(uuid())
+  assigneeEmail String?
+  assignee      User?    @relation(name: "TaskAssignment", fields: [assigneeEmail], references: [email])
+  creatorEmail  String
+  creator       User     @relation(name: "TaskCreation", fields: [creatorEmail], references: [email])
+  createdAt     DateTime @default(now())
+  name          String
+  description   String
+  voters        VotesOnTasks[]
+  tags          TagsOnTasks[]
+  completed     DateTime?
+}
+
+model Tag {
+  name String @id
+  tasks TagsOnTasks[]
+}
+
+model TagsOnTasks {
+  tagName String
+  tag     Tag    @relation(fields: [tagName], references: [name], onDelete: Cascade)
+  taskId  String
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([tagName, taskId])
+}
+
+model VotesOnTasks {
+  voterEmail String
+  voter      User @relation(fields: [voterEmail], references: [email])
+  taskId     String
+  task       Task @relation(fields: [taskId], references: [id])
+
+  @@id([voterEmail, taskId])
+}
+
+
