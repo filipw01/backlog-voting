@@ -74,29 +74,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Tags() {
   const data = useLoaderData<LoaderData>();
-  const [clientId, setClientId] = useState<string>();
-  useEffect(() => {
-    setClientId(window.ENV.GOOGLE_CLIENT_ID);
-  }, []);
-  const { user, setUser } = useUser();
-  return user === undefined ? (
-    clientId ? (
-      <GoogleLogin
-        clientId={clientId}
-        onSuccess={async (response) => {
-          if ("accessToken" in response) {
-            const res = await fetch("/login", {
-              method: "POST",
-              body: response.tokenId,
-            });
-            setUser(await res.json());
-          }
-        }}
-      />
-    ) : (
-      <div>Loading...</div>
-    )
-  ) : (
+  const { user } = useUser();
+  return (
     <>
       <Box p={4} maxWidth="container.lg" mx="auto">
         <Flex pb={4} justifyContent="space-between" alignItems="center">

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   ActionFunction,
   LoaderFunction,
@@ -7,7 +6,6 @@ import {
   useLoaderData,
 } from "remix";
 import type { TagsOnTasks, Task, User } from "@prisma/client";
-import GoogleLogin from "react-google-login";
 import { db } from "~/utils/db.server";
 import { TaskComponent } from "~/components/TaskComponent";
 import { useUser } from "~/components/UserProvider";
@@ -88,29 +86,8 @@ export default function Tasks() {
     .filter((task) => task.completed)
     .sort((taskA, taskB) => taskB.voters.length - taskA.voters.length);
 
-  const [clientId, setClientId] = useState<string>();
-  useEffect(() => {
-    setClientId(window.ENV.GOOGLE_CLIENT_ID);
-  }, []);
-  const { user, setUser } = useUser();
-  return user === undefined ? (
-    clientId ? (
-      <GoogleLogin
-        clientId={clientId}
-        onSuccess={async (response) => {
-          if ("accessToken" in response) {
-            const res = await fetch("/login", {
-              method: "POST",
-              body: response.tokenId,
-            });
-            setUser(await res.json());
-          }
-        }}
-      />
-    ) : (
-      <div>Loading...</div>
-    )
-  ) : (
+  const { user } = useUser();
+  return (
     <>
       <Outlet />
       <Box p={4} maxWidth="container.lg" mx="auto">

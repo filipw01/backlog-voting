@@ -7,7 +7,7 @@ export default function Logout() {
   const navigate = useNavigate();
   useEffect(() => {
     deleteUser();
-    navigate("/tasks");
+    navigate("/login");
   }, []);
   return null;
 }
